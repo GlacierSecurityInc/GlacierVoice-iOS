@@ -10,7 +10,7 @@ Glacier Voice is free to download and use (thanks to Belledonne Communications a
 
 Because Glacier services typically run within a private network, numerous assumptions were purposefully made to optimize and simplify usage for this specific scenario. Some of these design choices are not recommended for use outside of a Glacier network.
 
-Note: Glacier Voice is based on the free and open source project Belledonne Communications [Linphone](http://www.linphone.org), however Glacier Security nor any of Glacier Security’s partners, distributors, promoters or service providers are affiliated with Belledone Communications or their users.
+Note: Glacier Voice is based on the free and open source project Belledonne Communications [Linphone](http://www.linphone.org), however Glacier Security nor any of Glacier Security’s partners, distributors, promoters or service providers are affiliated with Belledonne Communications or their users.
 
 
 # Building and customizing the SDK
