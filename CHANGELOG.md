@@ -1,0 +1,153 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+
+
+## Version 2.0.3 (Mar 21, 2018)
+
+* Bug fixes and cleanup
+
+## Version 2.0.2 (Mar 03, 2018)
+
+* Bug fixes
+ 
+## Version 2.0.1 (Jan 29, 2018)
+
+* AWS Cognito integration
+* Side menu
+* Code for voice push module
+
+## Version 2.0 (Dec 1, 2017)
+
+* Bug fixes
+
+## Version 1.0 (Mar 30, 2017)
+
+* bug fixes
+* white labelling
+* send location
+* expiring messages
+
+
+
+# Based on Linphone-iPhone version 3.16.3, changelog below
+## [3.16.3] - 2017-05-03
+
+### Added
+- Imdm, chat message reception/lecture notification.
+
+### Changed
+- Optimization of Chat list
+
+### Fixed
+- Minor bugs fixes
+- Crashes on Call cancel too soon
+
+## [3.16.2] - 2017-03-01
+
+### Added
+- Link to GPLv2 licence and Linphone privacy policy in About View.
+
+### Changed
+- Optimization of Contact Lists
+
+### Fixed
+- CallKit bugs when invalid SIP address
+- CallKit error screens no longer displayed but ours
+- Crashes in Contact Lists
+- Presence supports network changes
+- Uses of linked address instead of phone number in chat rooms
+- Uses of display name instead of sip addresses in chat rooms and history lists
+
+## [3.16.1] - 2017-09-01
+
+### Added
+- Support of CallKit
+- Support of background task to finish sending messages and files when app is in background
+
+### Fixed
+- Freeze of UI when cancelling a swipe to delete too quickly
+
+## [3.15] - 2016-11-09
+
+### Added
+- Support of iOS 10
+- Support of PushKit (VoIP push notifications)
+- Added long term presence for linphone.org accounts: any user can now see his/her friends with a linphone.org account
+- Added TURN support
+- Change your password in your account settings
+
+### Changed
+- Updated push notification sound
+- Updated assistant to allow creating and authenticating account with a phone number
+- Updated translations
+- Improve VideoToolbox H264 decoder
+
+### Removed
+- None VoIP push notifications
+
+### Fixed
+- Correctly display name in Settings when using exotic characters
+- Correctly handle video policy when answering from push notification
+- Hide keyboard on dialer when address is empty
+- Better handling of multi accounts in side menu
+- Handle of notification actions
+- Rotation of camera view
+
+## [3.13.9] - 2016-06-15
+
+### Added
+- Added "Forgot your password?" link in Linphone account assistant
+- [Full IPv6 support to comply Apple requirements]
+- Hardware accelerated H264 codec
+- Full video HD support for newest devices (iPhone 6, iPhone SE, etc.)
+
+### Changed
+- Enable Neon intrinsics optimizations for speex resampler (ENABLE_ARM_NEON_INTRINSICS)
+- Push notifications are now configurable per account
+- Update to latest OpenH264 version to fix issue with Xcode 7.3 and arm64 devices [openh264 issue 2434]
+- Default transport reset to "UDP" for external accounts in assistant since most providers only support that
+- Remove deprecated polarssl submodule, using mbedtls instead
+
+### Fixed
+- Fix invalid photo rotation when using Camera for avatars
+- Fix self avatar save when using camera
+- Parse user input as SIP address or phone number depending on default account settings: if "substitute + by country code" is set,
+consider inputs to be phone numbers, otherwise SIP addresses.
+- Automatically start call when answering from within notification in iOS9+
+- Contact details view is now scrollable to fix issue on small screens
+- Unregister accounts in case of application shutdown when remote push notifications are not enabled
+- Reregister accounts in case of WiFi change
+
+## [3.12.1] - 2016-02-19
+
+### Changed
+- New About view
+- [plugins registration] procedure has been updated
+- iLBC has been removed - we are now using webrtc implementation instead, which is built by default. Removed libilbc.a from XCode project
+
+### Fixed
+- reload chat view on iPad on changes
+- remove “invalid length” error in assistant
+- remove comma from user-agent
+- properly display numpad in call
+- update application badge count when answering within notification
+
+## 3.0 - 2016-01-06
+
+### Added
+- Multi account support
+
+### Changed
+- New flat design rebranding
+
+## 0.7.6 - 2013-03-04
+
+### Added
+- Initial version
+
+[Unreleased]: https://github.com/BelledonneCommunications/linphone-iphone/compare/3.16.2...HEAD
+[3.16.2]: http://www.linphone.org/releases/ios/liblinphone-iphone-sdk-3.16.2.zip
+[3.16.1]: http://www.linphone.org/releases/ios/liblinphone-iphone-sdk-3.16.1.zip
+[plugins registration]: https://github.com/BelledonneCommunications/linphone-iphone/blob/3.12.1/Classes/LinphoneManager.m#L1461-L1472
+[openh264 issue 2434]: https://github.com/cisco/openh264/issues/2434
+[Full IPv6 support to comply Apple requirements]: https://developer.apple.com/news/?id=05042016a

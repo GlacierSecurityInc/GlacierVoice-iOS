@@ -1,0 +1,46 @@
+[app]
+#time in second between each link account popup
+link_account_popup_time=86400
+
+#Hide in the assistant the button to configure an external SIP account.
+hide_assistant_custom_account=0
+
+#Hide in the assistant the button to create a new SIP account
+hide_assistant_create_account=0
+
+
+#contact_display_username_only=1
+#contact_filter_on_default_domain=1
+#debug_popup_magic=**00**
+debug_popup_email=info@glaciersecurity.com
+send_logs_include_linphonerc_and_chathistory=0
+#use_phone_number=0
+publish_presence=0
+
+[assistant]
+password_length=-1
+username_length=-1
+
+[net]
+download_bw=0
+upload_bw=0
+
+[sip]
+sip_random_port=0
+#whether SIP passwords must be encrypted in configuration storage file
+store_ha1_passwd=0
+deliver_imdn=1
+
+[misc]
+#by default it is set to 30 by liblinphone
+history_max_size=-1
+
+[sound]
+dtmf_player_amp=0.007
+echocancellation=0
+eq_gains=50:2:50 100:2:50
+eq_location=mic
+ringer_dev_id=AQ: Audio Queue Device
+
+[video]
+display_filter_auto_rotate=0
