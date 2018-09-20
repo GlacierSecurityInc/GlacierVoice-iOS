@@ -53,4 +53,7 @@
 
 + (NSString *)localizedLabel:(NSString *)label;
 
+- (void)addAddressBookRecordsWithVCardData:(NSData *)data
+                                     error:(NSError * __autoreleasing *)error;
+
 @end

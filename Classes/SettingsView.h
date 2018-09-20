@@ -40,6 +40,8 @@
 - (IBAction)onBackClick:(id)sender;
 
 - (void)tryRemoveAccount;
-- (void)trySynchronize; 
+- (void)trySynchronize;
+
+- (void)trySetBypass:(BOOL)shouldBypass;
 
 @end

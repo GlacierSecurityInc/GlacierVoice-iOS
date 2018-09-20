@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -56,7 +56,7 @@
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                 </imageView>
                                 <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="IGd-0z-dvH">
-                                    <rect key="frame" x="125" y="8" width="240" height="355"/>
+                                    <rect key="frame" x="125" y="8" width="240" height="536"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2zV-wI-ANu">
@@ -94,9 +94,9 @@
                                             </constraints>
                                         </view>
                                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hRk-QH-TVU">
-                                            <rect key="frame" x="0.0" y="110" width="240" height="40"/>
+                                            <rect key="frame" x="0.0" y="110" width="240" height="60"/>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="40" id="9bu-dc-5gG"/>
+                                                <constraint firstAttribute="height" constant="60" id="9bu-dc-5gG"/>
                                             </constraints>
                                             <state key="normal" title="About">
                                                 <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -106,16 +106,16 @@
                                             </connections>
                                         </button>
                                         <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Z1Y-Cj-tzF">
-                                            <rect key="frame" x="0.0" y="150" width="240" height="1"/>
+                                            <rect key="frame" x="0.0" y="170" width="240" height="1"/>
                                             <color key="backgroundColor" red="0.1803921568627451" green="0.69411764705882351" blue="0.83529411764705885" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="1" id="ueY-Zt-9Jn"/>
                                             </constraints>
                                         </view>
                                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0an-Do-wgD">
-                                            <rect key="frame" x="0.0" y="151" width="240" height="40"/>
+                                            <rect key="frame" x="0.0" y="171" width="240" height="60"/>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="40" id="JIG-9C-lLQ"/>
+                                                <constraint firstAttribute="height" constant="60" id="JIG-9C-lLQ"/>
                                             </constraints>
                                             <state key="normal" title="Privacy Policy">
                                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -125,16 +125,16 @@
                                             </connections>
                                         </button>
                                         <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="syI-5f-GgR">
-                                            <rect key="frame" x="0.0" y="191" width="240" height="1"/>
+                                            <rect key="frame" x="0.0" y="231" width="240" height="1"/>
                                             <color key="backgroundColor" red="0.178696841" green="0.6925105453" blue="0.83489859099999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="1" id="6eO-eC-0fs"/>
                                             </constraints>
                                         </view>
                                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="15p-K9-qG8">
-                                            <rect key="frame" x="0.0" y="192" width="240" height="40"/>
+                                            <rect key="frame" x="0.0" y="232" width="240" height="60"/>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="40" id="hea-3Q-ZRb"/>
+                                                <constraint firstAttribute="height" constant="60" id="hea-3Q-ZRb"/>
                                             </constraints>
                                             <state key="normal" title="Acknowledgements">
                                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -144,16 +144,16 @@
                                             </connections>
                                         </button>
                                         <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dFs-qz-AcB">
-                                            <rect key="frame" x="0.0" y="232" width="240" height="1"/>
+                                            <rect key="frame" x="0.0" y="292" width="240" height="1"/>
                                             <color key="backgroundColor" red="0.178696841" green="0.6925105453" blue="0.83489859099999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="1" id="cg2-IA-LBY"/>
                                             </constraints>
                                         </view>
                                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lO4-Gq-p2V">
-                                            <rect key="frame" x="0.0" y="233" width="240" height="40"/>
+                                            <rect key="frame" x="0.0" y="293" width="240" height="60"/>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="40" id="XMM-cl-xMI"/>
+                                                <constraint firstAttribute="height" constant="60" id="XMM-cl-xMI"/>
                                             </constraints>
                                             <state key="normal" title="Support">
                                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -163,16 +163,16 @@
                                             </connections>
                                         </button>
                                         <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2lk-V6-U7q">
-                                            <rect key="frame" x="0.0" y="273" width="240" height="1"/>
+                                            <rect key="frame" x="0.0" y="353" width="240" height="1"/>
                                             <color key="backgroundColor" red="0.178696841" green="0.6925105453" blue="0.83489859099999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="1" id="bFT-IL-jV2"/>
                                             </constraints>
                                         </view>
                                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MIV-bg-pqa">
-                                            <rect key="frame" x="0.0" y="274" width="240" height="40"/>
+                                            <rect key="frame" x="0.0" y="354" width="240" height="60"/>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="40" id="Fb7-vv-mCe"/>
+                                                <constraint firstAttribute="height" constant="60" id="Fb7-vv-mCe"/>
                                             </constraints>
                                             <state key="normal" title="Import OpenVPN Profile">
                                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -181,17 +181,36 @@
                                                 <action selector="onAddVpnProfle:" destination="-1" eventType="touchUpInside" id="8jz-z5-6ET"/>
                                             </connections>
                                         </button>
+                                        <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Jq-zF-g3g">
+                                            <rect key="frame" x="0.0" y="414" width="240" height="1"/>
+                                            <color key="backgroundColor" red="0.178696841" green="0.6925105453" blue="0.83489859099999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="1" id="ib9-TO-fGT"/>
+                                            </constraints>
+                                        </view>
+                                        <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ewo-V1-o46">
+                                            <rect key="frame" x="0.0" y="415" width="240" height="60"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="60" id="I6k-hG-P83"/>
+                                            </constraints>
+                                            <state key="normal" title="Import Contacts">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="onImportContacts:" destination="-1" eventType="touchUpInside" id="UU7-3a-B9M"/>
+                                            </connections>
+                                        </button>
                                         <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="R2c-ba-DBH">
-                                            <rect key="frame" x="0.0" y="314" width="240" height="1"/>
+                                            <rect key="frame" x="0.0" y="475" width="240" height="1"/>
                                             <color key="backgroundColor" red="0.178696841" green="0.6925105453" blue="0.83489859099999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="1" id="TEc-e9-vIk"/>
                                             </constraints>
                                         </view>
                                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WfY-zS-1YM">
-                                            <rect key="frame" x="0.0" y="315" width="240" height="40"/>
+                                            <rect key="frame" x="0.0" y="476" width="240" height="60"/>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="40" id="Gwl-AK-JeT"/>
+                                                <constraint firstAttribute="height" constant="60" id="Gwl-AK-JeT"/>
                                             </constraints>
                                             <state key="normal" title="Log Out">
                                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

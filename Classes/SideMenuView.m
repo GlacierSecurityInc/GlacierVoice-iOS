@@ -77,7 +77,7 @@
 
 #pragma deploymate push "ignored-api-availability"
 - (void)onLateralSwipe:(UIScreenEdgePanGestureRecognizer *)pan {
-	
+	//[PhoneMainView.instance.mainViewController hideSideMenu:YES];
 }
 #pragma deploymate pop
 
@@ -86,11 +86,7 @@
 }
 
 - (IBAction)onAvatarClick:(id)sender {
-	// hide ourself because we are on top of image picker
-	/*if (!IPAD) {
-		[PhoneMainView.instance.mainViewController hideSideMenu:YES];
-	}
-	[ImagePickerView SelectImageFromDevice:self atPosition:_avatarImage inView:self.view];*/
+	// nothing
 }
 
 - (IBAction)onBackgroundClicked:(id)sender {
@@ -104,6 +100,15 @@
         [sbar hideMenu];
     }
     [PhoneMainView.instance handleAddVpnProfile];
+}
+
+- (IBAction)onImportContacts:(id)sender {
+    StatusBarView *sbar = (StatusBarView *)[PhoneMainView.instance.mainViewController
+                                            getCachedController:NSStringFromClass(StatusBarView.class)];
+    if (sbar) {
+        [sbar hideMenu];
+    }
+    [PhoneMainView.instance handleImportContacts];
 }
 
 - (IBAction)onPrivacyPolicy:(id)sender {
@@ -178,6 +183,7 @@
     }
     
     [PhoneMainView.instance teardownCognito];
+    //[PhoneMainView.instance changeCurrentView:AssistantView.compositeViewDescription];
     [PhoneMainView.instance setupAccount];
 }
 

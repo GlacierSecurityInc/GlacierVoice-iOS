@@ -313,7 +313,7 @@
     
     UIApplication *app = [UIApplication sharedApplication];
 	UIApplicationState state = app.applicationState;
-
+ 
 	LinphoneManager *instance = [LinphoneManager instance];
 	BOOL background_mode = [instance lpConfigBoolForKey:@"backgroundmode_preference"];
 	BOOL start_at_boot = [instance lpConfigBoolForKey:@"start_at_boot_preference"];
@@ -362,6 +362,13 @@
     LOGI(@"app launched with state : %li", (long)application.applicationState);
     LOGI(@"FINISH LAUNCHING WITH OPTION : %@", launchOptions.description);
     
+    // Log
+    //NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    //NSString *documentsDirectory = [paths objectAtIndex:0];
+    //NSString *fileName =[NSString stringWithFormat:@"%@.log",[NSDate date]];
+    //NSString *logFilePath = [documentsDirectory stringByAppendingPathComponent:fileName];
+    //freopen([logFilePath cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);
+    
 	return YES;
 }
 
@@ -389,6 +396,7 @@
 	}
 
 	[LinphoneManager.instance destroyLinphoneCore];
+    
     [PhoneMainView.instance teardownCognito];
 }
 
@@ -451,6 +459,7 @@
 			/*if we receive a remote notification, it is probably because our TCP background socket was no more working.
 			 As a result, break it and refresh registers in order to make sure to receive incoming INVITE or MESSAGE*/
 			if (linphone_core_get_calls(LC) == NULL) { // if there are calls, obviously our TCP socket shall be working
+                
                 [self reregister];
 
 				if (loc_key != nil) {
@@ -648,15 +657,18 @@ didInvalidatePushTokenForType:(NSString *)type {
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self tryWaitForNetwork];
-        //[self processRemoteNotification:payload.dictionaryPayload];
     });
 }
 
-
 - (void)tryWaitForNetwork {
     [LinphoneManager.instance setConnectingToNetwork:TRUE];
-    self.pingCtr = 7;
-    [self ping];
+    
+    if ([LinphoneManager.instance lpConfigBoolForKey:@"account_bypass_network_check"] && !self.pushInfo) {
+        [self pingResult:[NSNumber numberWithBool:YES]];
+    } else {
+        self.pingCtr = 7;
+        [self ping];
+    }
 }
 
 - (void)pushRegistry:(PKPushRegistry *)registry
@@ -667,11 +679,10 @@ didInvalidatePushTokenForType:(NSString *)type {
 	dispatch_async(dispatch_get_main_queue(), ^{
 	    [LinphoneManager.instance setPushNotificationToken:credentials.token];
         [self sendDeviceToken:credentials.token];
-        //self.pushToken = [self hexaString:credentials.token];
 	});
 }
 
-// ping for VPN/network check to make sure we can get to server
+//A ping for VPN/network check to make sure we can get to server
 - (void)pingResult:(NSNumber*)success {
     [self pingDealloc];
     if (success.boolValue) {
@@ -694,9 +705,13 @@ didInvalidatePushTokenForType:(NSString *)type {
         LOGI(@"PING_FAILURE %@, with number %d", [self getDomain], self.pingCtr);
         self.pingCtr--;
         if (self.pingCtr > 0) { //retry ping if ctr not finished
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self ping];
-            });
+            if (self.pingCtr <= 2 && [LinphoneManager.instance lpConfigBoolForKey:@"account_bypass_network_check"]) {
+                [self pingResult:[NSNumber numberWithBool:YES]];
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self ping];
+                });
+            }
         } else {
             [LinphoneManager.instance setConnectingToNetwork:FALSE];
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -826,7 +841,6 @@ didInvalidatePushTokenForType:(NSString *)type {
     return callId;
 }
 
-
 -(NSString*) convertPhoneNumber:(NSString *)extNumString{
     static NSCharacterSet* set = nil;
     if (set == nil){
@@ -936,7 +950,7 @@ didInvalidatePushTokenForType:(NSString *)type {
 }*/
 
 
-// to send push token to push module
+// send push token to push module
 -(void)placePostRequestWithURL:(NSString *)action withData:(NSDictionary *)dataToSend withHandler:(void (^)(NSURLResponse *response, NSData *data, NSError *error))ourBlock {
     NSString *urlString = [NSString stringWithFormat:@"%@", action];
     NSLog(@"%@", urlString);
@@ -968,7 +982,134 @@ didInvalidatePushTokenForType:(NSString *)type {
     }
 }
 
-// to send push token to push module
+-(void)placePostRequestNoHandler:(NSString *)action withData:(NSDictionary *)dataToSend {
+    NSString *urlString = [NSString stringWithFormat:@"%@", action];
+    NSLog(@"%@", urlString);
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    
+    NSError *error;
+    
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dataToSend options:0 error:&error];
+    
+    NSString *jsonString;
+    if (! jsonData) {
+        NSLog(@"Got an error: %@", error);
+    } else {
+        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        
+        NSData *requestData = [NSData dataWithBytes:[jsonString UTF8String] length:[jsonString lengthOfBytesUsingEncoding:NSUTF8StringEncoding]];
+        
+        [request setHTTPMethod:@"POST"];
+        [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+        [request setValue:@"application/json; charset=UTF-8" forHTTPHeaderField:@"Content-Type"];
+        [request setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[requestData length]] forHTTPHeaderField:@"Content-Length"];
+        [request setHTTPBody: requestData];
+        
+        //NSLog(@"Request body %@", [[NSString alloc] initWithData:[request HTTPBody] encoding:NSUTF8StringEncoding]);
+        
+        __block NSURLConnection *dconn = nil;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            dconn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+        });
+    }
+}
+
+// delegate code
+#pragma mark NSURLConnection Delegate Methods
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    // A response has been received, this is where we initialize the instance var you created
+    // so that we can append data to it in the didReceiveData method
+    // Furthermore, this method is called each time there is a redirect so reinitializing it
+    // also serves to clear it
+    _responseData = [[NSMutableData alloc] init];
+    _response = response;
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    // Append the new data to the instance variable you declared
+    [_responseData appendData:data];
+}
+
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
+                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
+    // Return nil to indicate not necessary to store a cached response for this connection
+    return nil;
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    // The request is complete and data has been received
+    // You can parse the stuff in your instance variable now
+    NSString *string = [[NSString alloc] initWithData:_responseData
+                                             encoding:NSUTF8StringEncoding];
+    
+    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)_response;
+    NSInteger code = [httpResponse statusCode];
+    NSLog(@"%ld", (long)code);
+    
+    if (!(code >= 200 && code < 300)) {
+        NSLog(@"ERROR (%ld): %@", (long)code, string);
+        [self performSelector:@selector(sendPushCredentialsFailure:) withObject:string];
+    } else {
+        NSLog(@"OK");
+        
+        NSDictionary *result = [NSDictionary dictionaryWithObjectsAndKeys:
+                                string, @"id",
+                                nil];
+        [self performSelector:@selector(sendPushCredentialsDidEnd:) withObject:result];
+    }
+    
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    // The request has failed for some reason!
+    // Check the error var
+    NSString *string = [[NSString alloc] initWithData:_responseData
+                                             encoding:NSUTF8StringEncoding];
+    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)_response;
+    NSInteger code = [httpResponse statusCode];
+    NSLog(@"%ld", (long)code);
+    
+    if (!(code >= 200 && code < 300)) {
+        NSLog(@"ERROR (%ld): %@", (long)code, string);
+        [self performSelector:@selector(sendPushCredentialsFailure:) withObject:string];
+    }
+}
+
+// to deal with self-signed certificates
+- (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace
+{
+    return [protectionSpace.authenticationMethod
+            isEqualToString:NSURLAuthenticationMethodServerTrust];
+}
+
+- (void)connection:(NSURLConnection *)connection
+didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    if ([challenge.protectionSpace.authenticationMethod
+         isEqualToString:NSURLAuthenticationMethodServerTrust])
+    {
+        NSString *appBundle = [[NSBundle mainBundle] bundlePath];
+        appBundle = [appBundle stringByAppendingPathComponent:@"InAppSettings.bundle"];
+        NSString *secPath = [appBundle stringByAppendingPathComponent:@"Secrets.plist"];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:secPath]) {
+            NSDictionary *secretDict = [[NSDictionary alloc] initWithContentsOfFile:secPath];
+            NSString *domainvalue = [secretDict objectForKey:@"defaultDomainAddress"];
+            
+            if ([challenge.protectionSpace.host isEqualToString:domainvalue]) // we only trust our own domain //
+            {
+                NSURLCredential *credential =
+                [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+                [challenge.sender useCredential:credential forAuthenticationChallenge:challenge];
+            }
+        }
+    }
+    
+    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+}
+
+// send push token to push module
 - (void)sendDeviceToken:(NSData*)deviceToken {
     
     NSString *hexToken = [self hexaString:deviceToken];
@@ -981,7 +1122,21 @@ didInvalidatePushTokenForType:(NSString *)type {
     if (!domaintest || !exten)
         return;
     
-    NSString *pushPath = [NSString stringWithFormat: @"http://%@/iospush_json.php", domaintest];
+    // set the port from secrets file
+    NSString *pushport = nil;
+    NSString *appBundle = [[NSBundle mainBundle] bundlePath];
+    appBundle = [appBundle stringByAppendingPathComponent:@"InAppSettings.bundle"];
+    NSString *secPath = [appBundle stringByAppendingPathComponent:@"Secrets.plist"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:secPath]) {
+        NSDictionary *secretDict = [[NSDictionary alloc] initWithContentsOfFile:secPath];
+        pushport = [secretDict objectForKey:@"defaultPushPort"];
+    }
+    
+    NSString *pushPath = [NSString stringWithFormat: @"https://%@/iospush_json.php", domaintest];
+    
+    if (pushport) {
+        pushPath = [NSString stringWithFormat: @"https://%@:%@/iospush_json.php", domaintest, pushport];
+    }
         
     NSDictionary *dataToSend = [NSDictionary dictionaryWithObjectsAndKeys:
                                 deviceId, @"device_id",
@@ -989,26 +1144,7 @@ didInvalidatePushTokenForType:(NSString *)type {
                                 exten, @"exten",
                                 displayName, @"displayname", nil];
     
-    [self placePostRequestWithURL:pushPath withData:dataToSend withHandler:^(NSURLResponse *response, NSData *rawData, NSError *error) {
-        NSString *string = [[NSString alloc] initWithData:rawData
-                                                 encoding:NSUTF8StringEncoding];
-        
-        NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
-        NSInteger code = [httpResponse statusCode];
-        NSLog(@"%ld", (long)code);
-        
-        if (!(code >= 200 && code < 300)) {
-            NSLog(@"ERROR (%ld): %@", (long)code, string);
-            [self performSelector:@selector(sendPushCredentialsFailure:) withObject:string];
-        } else {
-            NSLog(@"OK");
-            
-            NSDictionary *result = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    string, @"id",
-                                    nil];
-            [self performSelector:@selector(sendPushCredentialsDidEnd:) withObject:result];
-        }
-    }];
+    [self placePostRequestNoHandler:pushPath withData:dataToSend];
 }
 
 - (NSString *)hexaString:(NSData*)someData {
@@ -1038,7 +1174,6 @@ didInvalidatePushTokenForType:(NSString *)type {
     NSLog(@"sendPushCredentialsFailure:");
     // Do your actions
 }
-
 
 - (NSString *)getDomain {
     
@@ -1414,7 +1549,7 @@ didInvalidatePushTokenForType:(NSString *)type {
 		[[UIDevice currentDevice] setValue:value forKey:@"orientation"];
 		return UIInterfaceOrientationMaskPortrait;
 	}
-    else return UIInterfaceOrientationMaskPortrait; // UIInterfaceOrientationMaskAll;
+    else return UIInterfaceOrientationMaskPortrait; 
 }
 
 @end

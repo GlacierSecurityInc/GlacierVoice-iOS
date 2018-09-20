@@ -158,6 +158,7 @@
 	[super viewDidLoad];
     _statusBarTopConstraint.constant = IPHONE_STATUSBAR_HEIGHT;
     
+    // for SideMenu
     self.sideTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapForSide)];
     self.sideTapGestureRecognizer.numberOfTapsRequired = 1;
 }
@@ -342,7 +343,7 @@
 }
 
 - (IBAction)onRightSwipe:(id)sender {
-	
+	//[self hideSideMenu:NO];
 }
 
 + (void)addSubView:(UIViewController *)controller view:(UIView *)view {
@@ -606,8 +607,6 @@
 	CGRect sideMenuFrame = viewFrame;
     
     sideMenuFrame.origin.y = 0;
-    //sideMenuFrame.origin.y = origin - (currentViewDescription.fullscreen ? statusBarFrame.size.height : 0);
-	//sideMenuFrame.size.height -= sideMenuFrame.origin.y;
     sideMenuFrame.size.height = viewFrame.size.height+viewFrame.origin.y;
     
 	if (!currentViewDescription.sideMenuEnabled) {
@@ -616,7 +615,11 @@
         [self.mainViewController.view removeGestureRecognizer:self.sideTapGestureRecognizer];
     } else {
         sideMenuFrame.origin.x = -115;
-        //origin = viewFrame.origin.y;
+        
+        if ([self.sideMenuViewController isMemberOfClass:[CallSideMenuView class]]) {
+            sideMenuFrame.origin.x = 0;
+        }
+        
         origin = IPHONE_STATUSBAR_HEIGHT;
         statusBarFrame.origin.y = -statusBarFrame.size.height;
         [self.mainViewController.view addGestureRecognizer:self.sideTapGestureRecognizer];

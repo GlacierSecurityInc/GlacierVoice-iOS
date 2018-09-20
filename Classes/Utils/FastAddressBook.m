@@ -373,4 +373,62 @@ void sync_address_book(ABAddressBookRef addressBook, CFDictionaryRef info, void 
 	}
 }
 
+- (void)addAddressBookRecordsWithVCardData:(NSData *)data
+                                        error:(NSError * __autoreleasing *)error
+{
+    CFErrorRef addressBookError = NULL;
+    CFArrayRef people = ABPersonCreatePeopleInSourceWithVCardRepresentation(NULL, (__bridge CFDataRef)data);
+    
+    if (error) {
+        *error = (__bridge_transfer NSError *)addressBookError;
+    }
+    
+    NSMutableSet *contactSet = [NSMutableSet set];
+    for (CFIndex index = 0; index < CFArrayGetCount(people); index++) {
+        ABRecordRef person = CFArrayGetValueAtIndex(people, index);
+        [contactSet addObject:(__bridge id _Nonnull)(ABRecordCopyCompositeName(person))];
+    }
+    
+    
+    if (contactSet.count > 0) {
+        @synchronized(_addressBookMap) {
+            CFErrorRef error = NULL;
+            // remove Contacts that already exist in order to update
+            NSArray *allContacts = (__bridge NSArray *)ABAddressBookCopyArrayOfAllPeople(addressBook);
+            for (id record in allContacts){
+                ABRecordRef thisContact = (__bridge ABRecordRef)record;
+                error = NULL;
+                if ([contactSet containsObject:(__bridge id _Nonnull)(ABRecordCopyCompositeName(thisContact))]) {
+                    ABAddressBookRemoveRecord(addressBook, thisContact, (CFErrorRef *)&error);
+                }
+            }
+            
+            // add Contacts from incoming list
+            for (CFIndex index = 0; index < CFArrayGetCount(people); index++) {
+                ABRecordRef person = CFArrayGetValueAtIndex(people, index);
+                error = NULL;
+                //shouldnt need to check existance because should have already removed it
+
+                if (ABAddressBookAddRecord(addressBook, person, (CFErrorRef *)&error)) {
+                    LOGD(@"Add contact %p: Success!", person);
+                } else {
+                    LOGE(@"Add contact %p: Fail(%@)", person, [(__bridge NSError *)error localizedDescription]);
+                }
+            }
+            
+            // save Address Book
+            error = NULL;
+            if (ABAddressBookSave(addressBook, &error)) {
+                LOGI(@"Save AddressBook: Success!");
+            } else {
+                LOGE(@"Save AddressBook: Fail(%@)", [(__bridge NSError *)error localizedDescription]);
+            }
+            
+            [self reload];
+        }
+    }
+    
+    CFRelease(people);
+}
+
 @end

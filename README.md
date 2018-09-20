@@ -1,6 +1,6 @@
 # [Glacier](http://www.glaciersecurity.com) Voice
 
-[Glacier](http://www.glaciersecurity.com) Voice is a free and open source VoIP and video softphone based on the SIP protocol, and that is based on [Linphone](http://www.linphone.org/).
+[Glacier](http://www.glaciersecurity.com) Voice is a free and open source VoIP softphone based on the SIP protocol, and that is based on [Linphone](http://www.linphone.org/).
 
 ## Description
 

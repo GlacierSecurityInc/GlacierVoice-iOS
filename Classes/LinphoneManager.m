@@ -958,9 +958,9 @@ static void linphone_iphone_display_status(struct _LinphoneCore *lc, const char 
 			CFBridgingRelease((__bridge CFTypeRef)(data));
 		}
 
-        if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-                [self resignActive];
-        }
+        	if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+            		[self resignActive];
+        	}
 	}
     // Enable speaker when video
     if (state == LinphoneCallIncomingReceived || state == LinphoneCallOutgoingInit ||
@@ -1731,8 +1731,6 @@ void networkReachabilityCallBack(SCNetworkReachabilityRef target, SCNetworkReach
                     linphone_core_iterate(theLinphoneCore);
                 }
                 
-				//linphone_core_set_network_reachable(theLinphoneCore, true);
-				//linphone_core_iterate(theLinphoneCore);
 				LOGI(@"Network connectivity changed to type [%s]", (newConnectivity == wifi ? "wifi" : "wwan"));
 				lm.connectivity = newConnectivity;
 			}
@@ -2081,6 +2079,20 @@ void popup_link_account_cb(LinphoneAccountCreator *creator, LinphoneAccountCreat
 	linphone_core_cbs_unref(cbs);
 
 	LOGI(@"Create linphonecore %p", theLinphoneCore);
+    
+    // re-enable GSM (could do in linphonerc but requires uninstall)
+    PayloadType *pt;
+    const MSList *elem;
+    for (elem=linphone_core_get_audio_codecs(theLinphoneCore);elem!=NULL;elem=elem->next){
+        pt=(PayloadType*)elem->data;
+        NSString *pref=[LinphoneManager getPreferenceForCodec:pt->mime_type withRate:pt->clock_rate];
+        if(pref) {
+            //NSLog(@"Codec Settings %@",pref);
+            if(strcmp([pref UTF8String], "gsm_preference") == 0) {
+                linphone_core_enable_payload_type(theLinphoneCore,pt,true);
+            }
+        }
+    }
 
 	// Load plugins if available in the linphone SDK - otherwise these calls will do nothing
 	MSFactory *f = linphone_core_get_ms_factory(theLinphoneCore);
@@ -2095,7 +2107,7 @@ void popup_link_account_cb(LinphoneAccountCreator *creator, LinphoneAccountCreat
 	/* set the CA file no matter what, since the remote provisioning could be hitting an HTTPS server */
 	linphone_core_set_root_ca(theLinphoneCore, [LinphoneManager bundleFile:@"rootca.pem"].UTF8String);
 	linphone_core_set_user_certificates_path(theLinphoneCore, [LinphoneManager cacheDirectory].UTF8String);
-
+    
 	/* The core will call the linphone_iphone_configuring_status_changed callback when the remote provisioning is loaded
 	 (or skipped).
 	 Wait for this to finish the code configuration */
@@ -2302,7 +2314,6 @@ static int comp_call_state_paused(const LinphoneCall *call, const void *param) {
 			  UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
 			  content.title = NSLocalizedString(@"Missed call", nil);
               
-			  //content.body = NSLocalizedString(@"You have missed a call.", nil);
               LinphoneAppDelegate *delegate = (LinphoneAppDelegate *)[UIApplication sharedApplication].delegate;
               NSString *dname = [delegate getDisplayNameFromCallId:callId];
               content.body = [NSString stringWithFormat:@"Missed call from %@", dname];

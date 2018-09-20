@@ -32,4 +32,6 @@
 - (void)transformAccountToKeys:(NSString *)username;
 - (void)removeAccount;
 
+- (void)setBypass:(BOOL)shouldBypass;
+
 @end

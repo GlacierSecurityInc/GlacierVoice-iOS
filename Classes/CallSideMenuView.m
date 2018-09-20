@@ -12,6 +12,10 @@
 
 @implementation CallSideMenuView {
 	NSTimer *updateTimer;
+    
+    NSDictionary *attrs;
+    NSDictionary *boldTitleAttrs;
+    NSDictionary *boldAttrs;
 }
 
 #pragma mark - ViewController Functions
@@ -86,7 +90,7 @@
 	return NSLocalizedString(@"None", nil);
 }
 
-- (NSString *)updateStatsForCall:(LinphoneCall *)call stream:(LinphoneStreamType)stream {
+- (NSMutableAttributedString *)updateStatsForCall:(LinphoneCall *)call stream:(LinphoneStreamType)stream {
 	NSMutableString *result = [[NSMutableString alloc] init];
 	const PayloadType *payload = NULL;
 	const LinphoneCallStats *stats;
@@ -95,32 +99,148 @@
 
 	switch (stream) {
 		case LinphoneStreamTypeAudio:
-			name = @"Audio";
+			name = @"Audio\n";
 			payload = linphone_call_params_get_used_audio_codec(params);
 			stats = linphone_call_get_audio_stats(call);
 			break;
 		case LinphoneStreamTypeText:
-			name = @"Text";
+			name = @"Text \n";
 			payload = linphone_call_params_get_used_text_codec(params);
 			stats = linphone_call_get_text_stats(call);
 			break;
 		case LinphoneStreamTypeVideo:
-			name = @"Video";
+			name = @"Video\n";
 			payload = linphone_call_params_get_used_video_codec(params);
 			stats = linphone_call_get_video_stats(call);
 			break;
 		case LinphoneStreamTypeUnknown:
 			break;
 	}
-	if (payload == NULL) {
-		return result;
-	}
+    
+    NSMutableAttributedString *aresult = [[NSMutableAttributedString alloc] initWithString:result
+                                                                                attributes:attrs];
+    
+    if (payload == NULL) {
+        return aresult;
+    }
+    
+    NSMutableAttributedString *aname = [[NSMutableAttributedString alloc] initWithString:name
+                                                                                        attributes:boldTitleAttrs];
+    [aresult appendAttributedString:aname];
+    
+    NSMutableAttributedString *acodec = [[NSMutableAttributedString alloc] initWithString:@"\nCodec"
+                                                                              attributes:boldAttrs];
+    [aresult appendAttributedString:acodec];
+    NSMutableAttributedString *acodecval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %s/%iHz", payload->mime_type, payload->clock_rate] attributes:attrs];
+    [aresult appendAttributedString:acodecval];
+    
+    if (stream == LinphoneStreamTypeAudio) {
+        NSMutableAttributedString *achanval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"/%i channels", payload->channels] attributes:attrs];
+        [aresult appendAttributedString:achanval];
+    }
+    
+    const char *enc_desc = ms_factory_get_encoder(linphone_core_get_ms_factory(LC), payload->mime_type)->text;
+    const char *dec_desc = ms_factory_get_decoder(linphone_core_get_ms_factory(LC), payload->mime_type)->text;
+    if (strcmp(enc_desc, dec_desc) == 0) {
+        NSMutableAttributedString *acoder = [[NSMutableAttributedString alloc] initWithString:@"\nEncoder/Decoder"
+                                                                                   attributes:boldAttrs];
+        [aresult appendAttributedString:acoder];
+        NSMutableAttributedString *acoderval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %s", enc_desc] attributes:attrs];
+        [aresult appendAttributedString:acoderval];
+    } else {
+        NSMutableAttributedString *aencoder = [[NSMutableAttributedString alloc] initWithString:@"\nEncoder"
+                                                                                   attributes:boldAttrs];
+        [aresult appendAttributedString:aencoder];
+        NSMutableAttributedString *aencoderval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %s", enc_desc] attributes:attrs];
+        [aresult appendAttributedString:aencoderval];
+        
+        NSMutableAttributedString *adecoder = [[NSMutableAttributedString alloc] initWithString:@"\nDecoder"
+                                                                                     attributes:boldAttrs];
+        [aresult appendAttributedString:adecoder];
+        NSMutableAttributedString *adecoderval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %s", dec_desc] attributes:attrs];
+        [aresult appendAttributedString:adecoderval];
+    }
+    
+    if (stats != NULL) {
+        NSMutableAttributedString *adownband = [[NSMutableAttributedString alloc] initWithString:@"\nDownload bandwidth" attributes:boldAttrs];
+        [aresult appendAttributedString:adownband];
+        NSMutableAttributedString *adownbandval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %1.1f kbits/s", linphone_call_stats_get_download_bandwidth(stats)] attributes:attrs];
+        [aresult appendAttributedString:adownbandval];
+        
+        NSMutableAttributedString *aupband = [[NSMutableAttributedString alloc] initWithString:@"\nUpload bandwidth" attributes:boldAttrs];
+        [aresult appendAttributedString:aupband];
+        NSMutableAttributedString *aupbandval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %1.1f kbits/s", linphone_call_stats_get_upload_bandwidth(stats)] attributes:attrs];
+        [aresult appendAttributedString:aupbandval];
+        
+        if (stream == LinphoneStreamTypeVideo) {
+            NSMutableAttributedString *aestband = [[NSMutableAttributedString alloc] initWithString:@"\nEstimated download bandwidth" attributes:boldAttrs];
+            [aresult appendAttributedString:aestband];
+            NSMutableAttributedString *aestbandval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %1.1f kbits/s", linphone_call_stats_get_estimated_download_bandwidth(stats)] attributes:attrs];
+            [aresult appendAttributedString:aestbandval];
+        }
+        
+        NSMutableAttributedString *aice = [[NSMutableAttributedString alloc] initWithString:@"\nICE state" attributes:boldAttrs];
+        [aresult appendAttributedString:aice];
+        NSMutableAttributedString *aiceval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %@", [self.class iceToString:linphone_call_stats_get_ice_state(stats)]] attributes:attrs];
+        [aresult appendAttributedString:aiceval];
+        
+        NSMutableAttributedString *ainet = [[NSMutableAttributedString alloc] initWithString:@"\nIP Family" attributes:boldAttrs];
+        [aresult appendAttributedString:ainet];
+        NSMutableAttributedString *ainetval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %@", [self.class afinetToString:linphone_call_stats_get_ip_family_of_remote(stats)]] attributes:attrs];
+        [aresult appendAttributedString:ainetval];
+        
+        // RTP stats section (packet loss count, etc)
+        const rtp_stats_t rtp_stats = *linphone_call_stats_get_rtp_stats(stats);
+        NSMutableAttributedString *artp = [[NSMutableAttributedString alloc] initWithString:@"\nRTP packets" attributes:boldAttrs];
+        [aresult appendAttributedString:artp];
+        NSMutableAttributedString *artpval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %llu total, %lld cum loss, %llu discarded, %llu OOT, %llu bad", rtp_stats.packet_recv, rtp_stats.cum_packet_loss, rtp_stats.discarded,                  rtp_stats.outoftime, rtp_stats.bad] attributes:attrs];
+        [aresult appendAttributedString:artpval];
+        
+        NSMutableAttributedString *asend = [[NSMutableAttributedString alloc] initWithString:@"\nSender loss rate" attributes:boldAttrs];
+        [aresult appendAttributedString:asend];
+        NSMutableAttributedString *asendval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %.2f%%", linphone_call_stats_get_sender_loss_rate(stats)] attributes:attrs];
+        [aresult appendAttributedString:asendval];
+        
+        NSMutableAttributedString *arcv = [[NSMutableAttributedString alloc] initWithString:@"\nReceiver loss rate" attributes:boldAttrs];
+        [aresult appendAttributedString:arcv];
+        NSMutableAttributedString *arcvval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %.2f%%", linphone_call_stats_get_receiver_loss_rate(stats)] attributes:attrs];
+        [aresult appendAttributedString:arcvval];
+        
+        NSMutableAttributedString *ajit = [[NSMutableAttributedString alloc] initWithString:@"\nJitter Buffer" attributes:boldAttrs];
+        [aresult appendAttributedString:ajit];
+        NSMutableAttributedString *ajitval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %1.2f ms", linphone_call_stats_get_jitter_buffer_size_ms(stats)] attributes:attrs];
+        [aresult appendAttributedString:ajitval];
+        
+        if (stream == LinphoneStreamTypeVideo) {
+            MSVideoSize sentSize = linphone_call_params_get_sent_video_size(params);
+            MSVideoSize recvSize = linphone_call_params_get_received_video_size(params);
+            float sentFPS = linphone_call_params_get_sent_framerate(params);
+            float recvFPS = linphone_call_params_get_received_framerate(params);
+            
+            NSMutableAttributedString *asendvid = [[NSMutableAttributedString alloc] initWithString:@"\nSent video resolution" attributes:boldAttrs];
+            [aresult appendAttributedString:asendvid];
+            NSMutableAttributedString *asendvidval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %dx%d (%.1fFPS)", sentSize.width, sentSize.height, sentFPS] attributes:attrs];
+            [aresult appendAttributedString:asendvidval];
+            
+            NSMutableAttributedString *arcvvid = [[NSMutableAttributedString alloc] initWithString:@"\nReceived video resolution" attributes:boldAttrs];
+            [aresult appendAttributedString:arcvvid];
+            NSMutableAttributedString *arcvvidval = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@": %dx%d (%.1fFPS)", recvSize.width, recvSize.height, recvFPS] attributes:attrs];
+            [aresult appendAttributedString:arcvvidval];
+        }
+    }
+    
+    
 
-	[result appendString:@"\n"];
-	[result appendString:name];
-	[result appendString:@"\n"];
-
-	[result appendString:[NSString stringWithFormat:@"Codec: %s/%iHz", payload->mime_type, payload->clock_rate]];
+	/*
+    if (payload == NULL) {
+        return result;
+    }
+     
+    [result appendString:@"\n"];
+    [result appendString:name];
+    [result appendString:@"\n"];
+     
+    [result appendString:[NSString stringWithFormat:@"Codec: %s/%iHz", payload->mime_type, payload->clock_rate]];
 	if (stream == LinphoneStreamTypeAudio) {
 		[result appendString:[NSString stringWithFormat:@"/%i channels", payload->channels]];
 	}
@@ -188,8 +308,8 @@
 															recvSize.width, recvSize.height, recvFPS]];
 			[result appendString:@"\n"];
 		}
-	}
-	return result;
+	}*/
+	return aresult;
 }
 
 - (void)updateStats:(NSTimer *)timer {
@@ -201,18 +321,43 @@
 	}
 
 	NSMutableString *stats = [[NSMutableString alloc] init];
+    
+    const CGFloat fontSize = 16;
+    if (!attrs) {
+        attrs = @{ NSFontAttributeName:[UIFont systemFontOfSize:fontSize],
+                   NSForegroundColorAttributeName:[UIColor blackColor] };
+        boldTitleAttrs = @{ NSFontAttributeName:[UIFont boldSystemFontOfSize:fontSize+6],
+                            NSForegroundColorAttributeName:[UIColor blackColor] };
+        boldAttrs = @{ NSFontAttributeName:[UIFont boldSystemFontOfSize:fontSize],
+                            NSForegroundColorAttributeName:[UIColor blackColor] };
+    }
+    
+    NSDictionary *attrs = @{ NSFontAttributeName:[UIFont systemFontOfSize:fontSize],
+                             NSForegroundColorAttributeName:[UIColor blackColor] };
+    
+    NSMutableAttributedString *attributedStats = [[NSMutableAttributedString alloc] initWithString:stats
+                                                                                       attributes:attrs];
+    [attributedStats appendAttributedString:[self updateStatsForCall:call stream:LinphoneStreamTypeAudio]];
+    [attributedStats appendAttributedString:[self updateStatsForCall:call stream:LinphoneStreamTypeVideo]];
+    [attributedStats appendAttributedString:[self updateStatsForCall:call stream:LinphoneStreamTypeText]];
+    
 
 	LinphoneMediaEncryption enc = linphone_call_params_get_media_encryption(linphone_call_get_current_params(call));
 	if (enc != LinphoneMediaEncryptionNone) {
-		[stats appendString:[NSString
-								stringWithFormat:@"Call encrypted using %@", [self.class mediaEncryptionToString:enc]]];
+		//[stats appendString:[NSString
+		//						stringWithFormat:@"Call encrypted using %@", [self.class mediaEncryptionToString:enc]]];
+        
+        [attributedStats appendAttributedString: [[NSAttributedString alloc] initWithString: [NSString
+                stringWithFormat:@"\n\nCall encrypted using %@", [self.class mediaEncryptionToString:enc]]]];
 	}
 
-	[stats appendString:[self updateStatsForCall:call stream:LinphoneStreamTypeAudio]];
-	[stats appendString:[self updateStatsForCall:call stream:LinphoneStreamTypeVideo]];
-	[stats appendString:[self updateStatsForCall:call stream:LinphoneStreamTypeText]];
-
-	_statsLabel.text = stats;
+	//[stats appendString:[self updateStatsForCall:call stream:LinphoneStreamTypeAudio]];
+	//[stats appendString:[self updateStatsForCall:call stream:LinphoneStreamTypeVideo]];
+	//[stats appendString:[self updateStatsForCall:call stream:LinphoneStreamTypeText]];
+    
+    //_statsLabel.text = stats;
+    
+    [_statsLabel setAttributedText:attributedStats];
 }
 
 @end

@@ -283,6 +283,16 @@
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
 		<dict>
+			<key>Title</key>
+			<string>Bypass Network Check</string>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Key</key>
+			<string>account_bypass_network_check_preference</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
 			<key>Key</key>
 			<string>account_mandatory_change_password</string>
 			<key>Title</key>

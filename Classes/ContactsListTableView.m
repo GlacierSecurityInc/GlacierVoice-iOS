@@ -37,7 +37,9 @@
 
 - (void)onAddressBookUpdate:(NSNotification *)k {
 	if (!_ongoing && (PhoneMainView.instance.currentView == ContactsListView.compositeViewDescription)) {
-		[self loadData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self loadData];
+        });
 	}
 }
 
@@ -381,6 +383,7 @@ static int ms_strcmpfuz(const char *fuzzy_word, const char *sentence) {
 - (void)removeSelectionUsing:(void (^)(NSIndexPath *))remover {
 	[super removeSelectionUsing:^(NSIndexPath *indexPath) {
 	  [NSNotificationCenter.defaultCenter removeObserver:self];
+        
 
 	  NSString *firstChar = [addressBookMap keyAtIndex:[indexPath section]];
 	  NSMutableArray *subAr = [addressBookMap objectForKey:firstChar];

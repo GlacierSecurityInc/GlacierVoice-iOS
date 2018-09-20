@@ -1117,4 +1117,10 @@ void update_hash_cbs(LinphoneAccountCreator *creator, LinphoneAccountCreatorStat
         [self recomputeAccountLabelsAndSync];
     }
 }
+
+- (void)trySetBypass:(BOOL)shouldBypass {
+    if (settingsStore) {
+        [settingsStore setBypass:shouldBypass];
+    }
+}
 @end

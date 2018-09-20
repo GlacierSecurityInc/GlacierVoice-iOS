@@ -42,4 +42,5 @@
 - (void) hideMenu;
 - (IBAction)onClickClose:(id)sender;
 - (void) openingAbout;
+- (void) updateTempStatus:(NSString *)status;
 @end

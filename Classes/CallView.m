@@ -61,7 +61,7 @@ static UICompositeViewDescription *compositeDescription = nil;
 		compositeDescription = [[UICompositeViewDescription alloc] init:self.class
 															  statusBar:StatusBarView.class
 																 tabBar:nil
-															   sideMenu:nil
+															   sideMenu:CallSideMenuView.class
 															 fullscreen:false
 														 isLeftFragment:YES
 														   fragmentWith:nil];
@@ -423,7 +423,7 @@ static void hideSpinner(LinphoneCall *call, void *user_data) {
 		ms_free(uri);
 		[_avatarImage setImage:[FastAddressBook imageForAddress:addr] bordered:YES withRoundedRadius:YES];
         
-        // trying to get correct display name instead of extension
+        // get correct display name instead of extension
         const bctbx_list_t *logs = linphone_core_get_call_history_for_address(LC, addr);
         while (logs != NULL) {
             LinphoneCallLog *log = (LinphoneCallLog *)logs->data;
@@ -501,7 +501,9 @@ static void hideSpinner(LinphoneCall *call, void *user_data) {
 
 - (void)bluetoothAvailabilityUpdateEvent:(NSNotification *)notif {
 	bool available = [[notif.userInfo objectForKey:@"available"] intValue];
-	[self hideSpeaker:available];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self hideSpeaker:available];
+    });
 }
 
 - (void)callUpdateEvent:(NSNotification *)notif {
@@ -727,7 +729,6 @@ static void hideSpinner(LinphoneCall *call, void *user_data) {
 
 
 - (IBAction)onChatClick:(id)sender {
-    //[PhoneMainView.instance changeCurrentView:ChatsListView.compositeViewDescription];
     [self goGlacierMessenger];  // go to Glacier Messenger app
 }
 

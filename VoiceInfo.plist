@@ -17,5 +17,7 @@
 	<string></string>
 	<key>account_watch_notification_preference</key>
 	<false/>
+	<key>account_bypass_network_check_preference</key>
+	<false/>
 </dict>
 </plist>

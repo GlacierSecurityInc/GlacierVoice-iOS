@@ -42,7 +42,9 @@ INIT_WITH_COMMON_CF {
 #pragma mark - UIToggleButtonDelegate Functions
 
 - (void)audioRouteChangeListenerCallback:(NSNotification *)notif {
-	[self update];
+    dispatch_async(dispatch_get_main_queue(), ^{ 
+        [self update];
+    });
 }
 
 - (void)onOn {

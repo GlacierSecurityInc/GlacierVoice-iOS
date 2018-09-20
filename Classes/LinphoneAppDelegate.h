@@ -28,10 +28,12 @@
 #import "SimplePing.h"
 #import <Foundation/Foundation.h>
 
-@interface LinphoneAppDelegate : NSObject <UIApplicationDelegate, PKPushRegistryDelegate, UNUserNotificationCenterDelegate, SimplePingDelegate> {
+@interface LinphoneAppDelegate : NSObject <UIApplicationDelegate, PKPushRegistryDelegate, UNUserNotificationCenterDelegate, SimplePingDelegate, NSURLConnectionDelegate> {
     @private
 	UIBackgroundTaskIdentifier bgStartId;
     BOOL startedInBackground;
+    NSMutableData * _responseData;
+    NSURLResponse * _response;
 }
 
 - (void)registerForNotifications:(UIApplication *)app;
@@ -51,8 +53,7 @@
 @property int pingCtr;
 @property (nonatomic, retain) NSDictionary *pushInfo;
 @property BOOL justLaunched;
-@property (nonatomic, retain) NSString *pushToken; 
-
+@property (nonatomic, retain) NSString *pushToken;
 
 @end
 

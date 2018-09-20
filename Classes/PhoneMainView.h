@@ -106,8 +106,10 @@
 - (void)teardownCognito;
 - (void)setupAccount;
 - (void) handleAddVpnProfile;
+- (void) handleImportContacts;
 
 - (void) removeLocalVPNFiles; // removes VPN profiles stored in local Voice storage
+@property (nonatomic, strong) NSMutableArray *contactsArray; 
 
 - (void)changeCurrentView:(UICompositeViewDescription *)view;
 - (UIViewController*)popCurrentView;

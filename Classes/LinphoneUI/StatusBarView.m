@@ -31,6 +31,9 @@
 	NSTimer *callSecurityTimer;
 	int messagesUnreadCount;
     BOOL onAbout;
+    
+    NSString *tempStatus;
+    CFTimeInterval lastUpdate;
 }
 
 #pragma mark - Lifecycle Functions
@@ -77,6 +80,7 @@
 	// Update to default state
 	LinphoneProxyConfig *config = linphone_core_get_default_proxy_config(LC);
 	messagesUnreadCount = lp_config_get_int(linphone_core_get_config(LC), "app", "voice_mail_messages_count", 0);
+    tempStatus = nil;
 
 	[self proxyConfigUpdate:config];
 	[self updateUI:linphone_core_get_calls_nb(LC)];
@@ -208,6 +212,7 @@
         } else {
             message = @"Offline - Tap for OpenVPN";
         }
+        
 	} else if (gstate == LinphoneGlobalConfiguring) {
 		message = NSLocalizedString(@"Fetching remote configuration", nil);
 	} else if (config == NULL) {
@@ -217,6 +222,8 @@
 		} else {
 			message = NSLocalizedString(@"No account configured", nil);
 		}
+    } else if (tempStatus) {
+        message = tempStatus;
     } else {
 		state = linphone_proxy_config_get_state(config);
 
@@ -407,19 +414,34 @@
 }
 
 - (IBAction)onSideMenuClick:(id)sender {
-    if (!_outcallView.hidden) {
         UICompositeView *cvc = PhoneMainView.instance.mainViewController;
         CGRect sframe = cvc.sideMenuView.frame;
-        [cvc hideSideMenu:(sframe.origin.x > -350)];  //changed from x == 0
-    }
+        [cvc hideSideMenu:(sframe.origin.x > -350)];
 }
 
 - (void) openingAbout {
     onAbout = YES;
 }
 
-- (void) hideMenu {
+- (void) updateTempStatus:(NSString *)status {
+    tempStatus = status;
     
+    if (status != nil) {
+        [self registrationUpdate:nil];
+        lastUpdate = CACurrentMediaTime();
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self updateTempStatus:nil];
+        });
+    } else {
+        CFTimeInterval elapsedTime = CACurrentMediaTime() - lastUpdate;
+        if (elapsedTime > 3.0) {
+            [self registrationUpdate:nil];
+        }
+    }
+}
+
+- (void) hideMenu {
     [scloseBtn setImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
     [smenuBtn setImage:nil forState:UIControlStateNormal];
     [smenuBtn setEnabled:NO];
@@ -440,13 +462,12 @@
         _voicemailButton.enabled = (messagesUnreadCount > 0);
         
         onAbout = NO;
-    //}
 }
 
 - (IBAction)onRegistrationStateClick:(id)sender {
 	if (linphone_core_get_default_proxy_config(LC)) {
         // handle various vpn types
-        if (!linphone_core_is_network_reachable(LC)) {
+        if (!linphone_core_is_network_reachable(LC)) { 
             UIApplication *app = [UIApplication sharedApplication];
             LinphoneAppDelegate *delegate = (LinphoneAppDelegate *)app.delegate;
             

@@ -127,7 +127,6 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
 @implementation SimplePing
 
 - (instancetype)initWithHostName:(NSString *)hostName {
-    NSParameterAssert(hostName != nil);
     if (hostName == nil) 
         return nil;
     

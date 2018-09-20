@@ -193,6 +193,7 @@
 						  forKey:@"account_display_name_preference"];
 				[self setCString:linphone_address_get_domain(identity_addr)
 						  forKey:@"account_mandatory_domain_preference"];
+
                 [self getExternalPreferences];
 				if (strcmp(linphone_address_get_domain(identity_addr), linphone_address_get_domain(proxy_addr)) != 0 ||
 					port > 0) {
@@ -975,7 +976,6 @@
     NSArray *paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsPath = [paths objectAtIndex:0];
     NSString *plistPath = [documentsPath stringByAppendingPathComponent:@"VoiceInfo.plist"];
-    //NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"VoiceInfo" ofType:@"plist"];
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:plistPath])
     {
@@ -989,13 +989,22 @@
     [self setObject:[pdict objectForKey:@"account_external_number_preference"] forKey:@"account_external_number_preference"];
     [self setBool:watchPref forKey:@"account_watch_notification_preference"];
     [LinphoneManager.instance lpConfigSetBool:watchPref forKey:@"account_watch_notification"];
+    
+    bool bypassPref = [[pdict objectForKey:@"account_bypass_network_check_preference"] boolValue];
+    [self setBool:bypassPref forKey:@"account_bypass_network_check_preference"];
+    [LinphoneManager.instance lpConfigSetBool:bypassPref forKey:@"account_bypass_network_check"];
+}
+
+- (void)setBypass:(BOOL)shouldBypass {
+    [self setBool:shouldBypass forKey:@"account_bypass_network_check_preference"];
+    [LinphoneManager.instance lpConfigSetBool:shouldBypass forKey:@"account_bypass_network_check"];
+    [self saveExternalPreferences];
 }
 
 - (void)saveExternalPreferences {
     NSArray *paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsPath = [paths objectAtIndex:0];
     NSString *plistPath = [documentsPath stringByAppendingPathComponent:@"VoiceInfo.plist"];
-    //NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"VoiceInfo" ofType:@"plist"];
     
     NSString *externalNumber = [self stringForKey:@"account_external_number_preference"];
     if (!(externalNumber && [externalNumber length] > 1)) {
@@ -1009,11 +1018,18 @@
     bool bwatchPref = [self boolForKey:@"account_watch_notification_preference"];
     [LinphoneManager.instance lpConfigSetBool:bwatchPref forKey:@"account_watch_notification"];
     
+    NSNumber *bypassPref = [self objectForKey:@"account_bypass_network_check_preference"];
+    if (!bypassPref) {
+        bypassPref = [NSNumber numberWithBool:NO];
+    }
+    bool bbypassPref = [self boolForKey:@"account_bypass_network_check_preference"];
+    [LinphoneManager.instance lpConfigSetBool:bbypassPref forKey:@"account_bypass_network_check"];
+    
     NSMutableDictionary *pdictionary = [NSMutableDictionary dictionaryWithContentsOfFile:(NSString *)plistPath];
     
     if (!pdictionary)
     {
-        NSDictionary *plistDict = [[NSDictionary alloc] initWithObjects: [NSArray arrayWithObjects: externalNumber, watchPref, nil] forKeys:[NSArray arrayWithObjects: @"account_external_number_preference", @"account_watch_notification_preference", nil]];
+        NSDictionary *plistDict = [[NSDictionary alloc] initWithObjects: [NSArray arrayWithObjects: externalNumber, watchPref, bypassPref, nil] forKeys:[NSArray arrayWithObjects: @"account_external_number_preference", @"account_watch_notification_preference", @"account_bypass_network_check_preference", nil]];
         
         NSString *error = nil;
         NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:plistDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&error];
@@ -1027,6 +1043,7 @@
     
     [pdictionary setObject:externalNumber forKey:@"account_external_number_preference"];
     [pdictionary setObject:watchPref forKey:@"account_watch_notification_preference"];
+    [pdictionary setObject:bypassPref forKey:@"account_bypass_network_check_preference"];
     [pdictionary writeToFile:plistPath atomically:YES];
 }
 

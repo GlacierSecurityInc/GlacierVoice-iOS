@@ -31,7 +31,7 @@ static UICompositeViewDescription *compositeDescription = nil;
 		compositeDescription = [[UICompositeViewDescription alloc] init:self.class
 															  statusBar:StatusBarView.class
 																 tabBar:nil
-															   sideMenu:nil 
+															   sideMenu:CallSideMenuView.class
 															 fullscreen:false
 														 isLeftFragment:NO
 														   fragmentWith:nil];
@@ -69,7 +69,7 @@ static UICompositeViewDescription *compositeDescription = nil;
 	ms_free(uri);
 	[_avatarImage setImage:[FastAddressBook imageForAddress:addr] bordered:NO withRoundedRadius:YES];
     
-    // trying to get correct display name instead of extension
+    // get correct display name instead of extension
     const bctbx_list_t *logs = linphone_core_get_call_history_for_address(LC, addr);
     while (logs != NULL) {
         LinphoneCallLog *log = (LinphoneCallLog *)logs->data;
@@ -166,7 +166,9 @@ static UICompositeViewDescription *compositeDescription = nil;
 
 - (void)bluetoothAvailabilityUpdateEvent:(NSNotification *)notif {
 	bool available = [[notif.userInfo objectForKey:@"available"] intValue];
-	[self hideSpeaker:available];
+    dispatch_async(dispatch_get_main_queue(), ^{ 
+        [self hideSpeaker:available];
+    });
 }
 
 @end

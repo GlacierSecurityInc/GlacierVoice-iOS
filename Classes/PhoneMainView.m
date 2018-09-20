@@ -124,6 +124,8 @@ static RootViewManager *rootViewManagerInstance = nil;
 AVAudioPlayer *avCallFailedPlayer;
 NSDictionary *secretDict;
 
+BOOL contactsOnly;
+
 #pragma mark - Lifecycle Functions
 
 - (void)initPhoneMainView {
@@ -133,6 +135,7 @@ NSDictionary *secretDict;
 	inhibitedEvents = [[NSMutableArray alloc] init];
     
     self.dataArray = [NSMutableArray new];
+    self.contactsArray = [NSMutableArray new];
     
     // custom unable to complete call message
     NSURL *soundURL = [[NSBundle mainBundle] URLForResource:@"glacier_unable_to_complete_call"
@@ -229,7 +232,6 @@ NSDictionary *secretDict;
     [self removeLocalVPNFiles];
 }
 
-// from commit 6491cce43c5c840940bcd30cbaca7cd3fe9b2e22
 /* IPHONE X specific : hide the HomeIndcator when not used */  
 #define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
 #define IS_IPHONE_X (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 812.0)
@@ -271,7 +273,7 @@ NSDictionary *secretDict;
 - (NSUInteger)supportedInterfaceOrientations
 #endif
 {
-    return UIInterfaceOrientationMaskPortrait; // UIInterfaceOrientationMaskAll;
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
@@ -332,7 +334,7 @@ NSDictionary *secretDict;
 	LinphoneRegistrationState state = [[notif.userInfo objectForKey:@"state"] intValue];
 	if (state == LinphoneRegistrationFailed && ![currentView equal:AssistantView.compositeViewDescription] &&
 		[UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-        
+        // nothing
 	}
 }
 
@@ -558,6 +560,7 @@ NSDictionary *secretDict;
         NSString *passvalue = [glacierDefaults stringForKey:@"password"];
         NSString *displayvalue = [glacierDefaults stringForKey:@"displayname"];
         NSString *connectionvalue = [glacierDefaults stringForKey:@"connection"];
+        contactsOnly = NO; 
         
         if (!extvalue.length || !passvalue.length) { //go to AssistantView
             [self displayAssistantView:YES];
@@ -578,6 +581,16 @@ NSDictionary *secretDict;
                     if ([self needsOpenVPN]) {
                         [self returnToMainView];
                         return;
+                    }
+                    SettingsView *sview = VIEW(SettingsView);
+                    if (sview) {
+                        [sview trySetBypass:NO];
+                    }
+                } else if ([connectionvalue isEqualToString:@"none"]) {
+                    domainvalue = [secretDict objectForKey:@"defaultPublicDomainAddress"];
+                    SettingsView *sview = VIEW(SettingsView);
+                    if (sview) {
+                        [sview trySetBypass:YES];
                     }
                 }
             }
@@ -735,7 +748,7 @@ NSDictionary *secretDict;
 		// In iOS7, the app has a black background on dialer, incoming and incall, so we have to adjust the
 		// status bar style for each transition to/from these views
 		BOOL toLightStatus = (to_view != NULL) && ![to_view darkBackground];
-        toLightStatus = true; 
+        toLightStatus = true;
 		if (!toLightStatus) {
 			// black bg: white text on black background
 			[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
@@ -975,7 +988,7 @@ NSDictionary *secretDict;
 	linphone_call_terminate(call);
 }
 
-// here to end AWS Cognito is the primary way to login and pull account settings
+// AWS Cognito is the primary way to login and pull account settings
 - (void)setupCognito {
     NSError *error = nil;
     if (![[NSFileManager defaultManager] createDirectoryAtPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"download"] withIntermediateDirectories:YES
@@ -1026,11 +1039,25 @@ NSDictionary *secretDict;
         return;
     }
     
+    contactsOnly = NO;
     if (![self coreSignedIn]) {
         [self displayAssistantView:NO];
     } else {
         [self getUserDetails];
-        
+        [self returnToMainView];
+    }
+}
+
+- (void) handleImportContacts {
+    [self updateTempStatus:@"Updating contacts"];
+    contactsOnly = YES;
+    if (![self coreSignedIn]) {
+        [self displayAssistantView:NO];
+    } else {
+        [self.mainViewController hideSideMenu:YES];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self getUserDetails];
+        });
         [self returnToMainView];
     }
 }
@@ -1090,14 +1117,23 @@ NSDictionary *secretDict;
     self.bucketOrg = [glacierDefaults objectForKey:@"orgid"];
     if (self.bucketOrg) {
         AWSS3ListObjectsRequest *listObjectsRequest = [AWSS3ListObjectsRequest new];
-        self.bucketPrefix = @"users"; //identityId;
+        self.bucketPrefix = @"users";
         listObjectsRequest.prefix = self.bucketPrefix;
         
         // get AWS bucket name to pull account settings from
         if (secretDict != nil) {
             self.s3BucketName = [[secretDict objectForKey:@"s3BucketConstant"] stringByAppendingString:self.bucketOrg];
-            listObjectsRequest.bucket = self.s3BucketName;
-            [self listObjects:listObjectsRequest];
+            
+            if (contactsOnly) { //check for existing account too?
+                LOGD(@"Updating contacts");
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [self getVCardForUser];
+                });
+                [self returnToMainView];
+            } else {
+                listObjectsRequest.bucket = self.s3BucketName;
+                [self listObjects:listObjectsRequest];
+            }
         } else {
             NSLog(@"Could not createListObjectsRequestWithId due to no Secrets.plist in bundle");
         }
@@ -1135,17 +1171,19 @@ NSDictionary *secretDict;
             
             [self getGlacierData];
             
-            if (self.dataArray.count > 0 && [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"openvpn://"]]) {
+            if (self.dataArray.count > 0) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    CZPickerView *picker = [[CZPickerView alloc] initWithHeaderTitle:@"Add VPN Connection"
+                    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"openvpn://"]]) {
+                        CZPickerView *picker = [[CZPickerView alloc] initWithHeaderTitle:@"Add VPN Connection"
                                                                    cancelButtonTitle:@"Cancel"
                                                                   confirmButtonTitle:@"Confirm"];
-                    picker.delegate = self;
-                    picker.dataSource = self;
-                    /** picker header background color */
-                    picker.headerBackgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"color_Gl.png"]];
+                        picker.delegate = self;
+                        picker.dataSource = self;
+                        /** picker header background color */
+                        picker.headerBackgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"color_Gl.png"]];
 
-                    [picker show];
+                        [picker show];
+                    }
                 });
             }
         }
@@ -1202,29 +1240,94 @@ NSDictionary *secretDict;
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setupAccount];
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [self getVCardForUser];
+            });
         });
     }
 }
 
-- (void)download:(AWSS3TransferManagerDownloadRequest *)downloadRequest {
+- (void) getVCardForUser {
     
+    NSString *usercontacts = [self.user.username stringByAppendingPathExtension:@"vcf"];
+    NSString *downloadingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"download"];
+    [self.contactsArray removeAllObjects];
+    LOGD(@"getVCardForUser");
+        
+    AWSS3TransferManagerDownloadRequest *globalRequest = [AWSS3TransferManagerDownloadRequest new];
+    globalRequest.bucket = self.s3BucketName;
+    NSString *globalvcf = [@"contacts" stringByAppendingPathComponent:@"global.vcf"];
+    globalRequest.key = globalvcf;
+    NSString *globalFilePath = [downloadingFilePath stringByAppendingPathComponent:@"global.vcf"];
+    NSURL *globalURL = [NSURL fileURLWithPath:globalFilePath];
+    globalRequest.downloadingFileURL = globalURL;
+    [self download:globalRequest];
+            
+    AWSS3TransferManagerDownloadRequest *userRequest = [AWSS3TransferManagerDownloadRequest new];
+    userRequest.bucket = self.s3BucketName;
+    NSString *uservcf = [@"contacts" stringByAppendingPathComponent:usercontacts];
+    userRequest.key = uservcf;
+    NSString *userFilePath = [downloadingFilePath stringByAppendingPathComponent:usercontacts];
+    userRequest.downloadingFileURL = [NSURL fileURLWithPath:userFilePath];
+    [self download:userRequest];
+}
+
+- (void) handleVCard:(NSURL *)vcardURL {
+    LOGD(@"*** handleVCard");
+    NSData *data = [NSData dataWithContentsOfURL:vcardURL];
+    
+    if (data == nil) {
+        NSLog(@"Error reading file: %@", vcardURL.absoluteString);
+        if (contactsOnly) {
+            [self updateTempStatus:@"Could not update contacts"];
+        }
+    } else {
+        LinphoneProxyConfig *default_proxy = linphone_core_get_default_proxy_config(LC);
+        if (default_proxy != NULL) {
+            [[LinphoneManager.instance fastAddressBook] addAddressBookRecordsWithVCardData:data error:nil];
+            [LinphoneManager.instance fastAddressBook].needToUpdate = FALSE;
+        }
+    }
+    NSLog(@"Finished processing file: %@", vcardURL.absoluteString);
+}
+
+- (void)download:(AWSS3TransferManagerDownloadRequest *)downloadRequest {
+    LOGD(@"start download");
     AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
     [[transferManager download:downloadRequest] continueWithBlock:^id(AWSTask *task) {
+        //LOGD(@"*** download request completed");
         if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]
             && task.error.code == AWSS3TransferManagerErrorPaused) {
             NSLog(@"Download paused.");
         } else if (task.error) {
             NSLog(@"Download failed: [%@]", task.error);
+            LOGD(@"download request failed");
         } else {
             NSURL *downloadFileURL = downloadRequest.downloadingFileURL;
-            if ([[downloadFileURL pathExtension] isEqualToString:@"glacier"]) {
-                [self readAndStoreGlacierData];
-            } else if ([[downloadFileURL pathExtension] isEqualToString:@"ovpn"]) {
-                [self tryOpenUrl:downloadFileURL];
-            }
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                if ([[downloadFileURL pathExtension] isEqualToString:@"glacier"]) {
+                    [self readAndStoreGlacierData];
+                } else if ([[downloadFileURL pathExtension] isEqualToString:@"ovpn"]) {
+                    [self tryOpenUrl:downloadFileURL];
+                } else if ([[downloadFileURL pathExtension] isEqualToString:@"vcf"]) {
+                    [self handleVCard:downloadFileURL];
+                }
+            });
         }
         return nil;
     }];
+}
+
+- (void)updateTempStatus:(NSString *)status {
+    StatusBarView *sbar = (StatusBarView *)[PhoneMainView.instance.mainViewController
+                                            getCachedController:NSStringFromClass(StatusBarView.class)];
+    if (sbar) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [sbar updateTempStatus:status];
+        });
+    }
 }
 
 - (UIDocumentInteractionController *)controller {
@@ -1240,7 +1343,7 @@ NSDictionary *secretDict;
 - (void) tryOpenUrl:(NSURL *)fileURL {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (fileURL) {
-            //Starting to send this to net.openvpn.connect.app
+            //Starting to send this puppy to net.openvpn.connect.app
             self.controller.URL = fileURL;
             [self.controller presentOpenInMenuFromRect:self.view.frame inView:self.view animated:YES];
         }
