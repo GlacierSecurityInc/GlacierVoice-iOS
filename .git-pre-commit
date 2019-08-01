@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# This hook purpose is to keep coding style consistent between all developers
+# It is automatically installed in .git/hooks folder by cmake on first run.
+
+# From https://github.com/tatsuhiro-t/nghttp2/blob/master/pre-commit
+
+git_clang_format_path="$(which git-clang-format)"
+clang_format_path=$(find /usr/bin /usr/local/bin/ -name 'clang-format-diff*' -type f -maxdepth 1 | tail -n1)
+
+
+function git-clang-format-diffing {
+    options="--style=file"
+
+    #only diffing commited files, ignored staged one
+    $git_clang_format_path $options --diff $(git --no-pager diff --cached --name-status | grep -v '^D' | cut -f2) > diff-format.patch
+
+    if grep -q -E '(no modified files to format|clang-format did not modify any files)' diff-format.patch; then
+        rm diff-format.patch
+    fi
+}
+
+function clang-format-diff-diffing {
+    options="-style file"
+
+    git diff-index --cached --diff-filter=ACMR -p HEAD -- | $clang_format_path $options -p1 > file-format.patch
+    if [ ! -s file-format.patch ]; then
+        rm file-format.patch
+    fi
+}
+
+set -e
+
+if [ -z "$git_clang_format_path$clang_format_path" ]; then
+    echo "$0: Please install clang-format (coding style checker) - could not find git-clang-format nor clang-format-diff in PATH. Skipping code verification..."
+    exit 0
+fi
+
+if [ ! -z "$git_clang_format_path" ]; then
+    git-clang-format-diffing
+fi
+
+if [ ! -z "$clang_format_path" ]; then
+    # Warning! We need at least version 1.6...
+    clang-format-diff-diffing
+fi
+
+if [ -f diff-format.patch ] || [ -f file-format.patch ]; then
+    [ -f diff-format.patch ] && cat diff-format.patch
+    echo "**********************************************************************"
+    echo "$0: Invalid coding style detected. Please correct it using one of the following:"
+    echo "* Reformat these lines manually."
+    [ -f diff-format.patch ] && printf "* Apply diff patch using:\n\tcd $(git rev-parse --show-toplevel) && git apply diff-format.patch\n"
+    [ -f file-format.patch ] && printf "* Apply diff patch using:\n\tpatch -p0 < file-format.patch\n"
+    echo "*** Aborting commit.***"
+    exit 1
+fi
