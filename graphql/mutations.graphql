@@ -1,0 +1,40 @@
+# this is an auto generated file. This will be overwritten
+mutation CreateGlacierUsers($input: CreateGlacierUsersInput!) {
+  createGlacierUsers(input: $input) {
+    organization
+    username
+    email
+    extension_voiceserver
+    first_name
+    glacierpwd
+    last_name
+    messenger_id
+    user_name
+  }
+}
+mutation UpdateGlacierUsers($input: UpdateGlacierUsersInput!) {
+  updateGlacierUsers(input: $input) {
+    organization
+    username
+    email
+    extension_voiceserver
+    first_name
+    glacierpwd
+    last_name
+    messenger_id
+    user_name
+  }
+}
+mutation DeleteGlacierUsers($input: DeleteGlacierUsersInput!) {
+  deleteGlacierUsers(input: $input) {
+    organization
+    username
+    email
+    extension_voiceserver
+    first_name
+    glacierpwd
+    last_name
+    messenger_id
+    user_name
+  }
+}

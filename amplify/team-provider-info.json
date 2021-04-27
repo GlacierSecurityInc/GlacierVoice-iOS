@@ -1,0 +1,15 @@
+{
+    "ios": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-voice-ios-94445-authRole",
+            "UnauthRoleArn": "arn:aws:iam::436047375239:role/amplify-voice-ios-94445-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::436047375239:role/amplify-voice-ios-94445-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "amplify-voice-ios-94445-deployment",
+            "UnauthRoleName": "amplify-voice-ios-94445-unauthRole",
+            "StackName": "amplify-voice-ios-94445",
+            "StackId": "arn:aws:cloudformation:us-east-1:436047375239:stack/amplify-voice-ios-94445/4e642610-678c-11ea-9c9a-0eba1c1b0c34",
+            "AmplifyAppId": "diq3v20hua8gi"
+        }
+    }
+}

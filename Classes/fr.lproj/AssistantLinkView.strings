@@ -1,0 +1,72 @@
+
+/* Class = "UILabel"; accessibilityLabel = "Account setup assistant"; ObjectID = "0xQ-6c-cAc"; */
+"0xQ-6c-cAc.accessibilityLabel" = "Assistant de configuration de compte";
+
+/* Class = "UILabel"; text = "LINK YOUR ACCOUNT"; ObjectID = "0xQ-6c-cAc"; */
+"0xQ-6c-cAc.text" = "LIER VOTRE COMPTE";
+
+/* Class = "UILabel"; accessibilityLabel = "Account setup assistant"; ObjectID = "5aj-17-dC2"; */
+"5aj-17-dC2.accessibilityLabel" = "Assistant de configuration de compte";
+
+/* Class = "UILabel"; text = "LINK YOUR ACCOUNT"; ObjectID = "5aj-17-dC2"; */
+"5aj-17-dC2.text" = "LIER VOTRE COMPTE";
+
+/* Class = "UIButton"; accessibilityLabel = "Create account"; ObjectID = "D25-6f-qRg"; */
+"D25-6f-qRg.accessibilityLabel" = "Créer un compte";
+
+/* Class = "UIButton"; normalTitle = "LINK ACCOUNT"; ObjectID = "D25-6f-qRg"; */
+"D25-6f-qRg.normalTitle" = "LIER LE COMPTE";
+
+/* Class = "UITextField"; placeholder = "+1"; ObjectID = "DBr-NA-Ibx"; */
+"DBr-NA-Ibx.placeholder" = "+33";
+
+/* Class = "UILabel"; accessibilityLabel = "Account setup assistant"; ObjectID = "Dvq-wa-3k8"; */
+"Dvq-wa-3k8.accessibilityLabel" = "Assistant de configuration de compte";
+
+/* Class = "UILabel"; text = "We have sent you a SMS with a validation code. To complete your phone number verification, please enter the 4 digit code below:"; ObjectID = "Dvq-wa-3k8"; */
+"Dvq-wa-3k8.text" = "Nous vous avons envoyé un SMS avec un code d'activation.\nPour valider votre numéro, veuillez entrer le code à 4 chiffres ci-dessous :";
+
+/* Class = "UITextField"; placeholder = "Activation code"; ObjectID = "PXL-cl-haZ"; */
+"PXL-cl-haZ.placeholder" = "Code d'activation";
+
+/* Class = "UILabel"; accessibilityLabel = "Account setup assistant"; ObjectID = "RQz-tT-5vp"; */
+"RQz-tT-5vp.accessibilityLabel" = "Assistant de configuration de compte";
+
+/* Class = "UILabel"; text = "Please confirm your country code and enter your phone number"; ObjectID = "RQz-tT-5vp"; */
+"RQz-tT-5vp.text" = "Confirmez l'indicatif téléphonique de votre pays et saisissez votre numéro de téléphone";
+
+/* Class = "UIButton"; accessibilityLabel = "Add contact"; ObjectID = "VlN-Em-1V6"; */
+"VlN-Em-1V6.accessibilityLabel" = "Ajouter un contact";
+
+/* Class = "UIButton"; accessibilityLabel = "Finish configuration"; ObjectID = "bIM-bh-Huy"; */
+"bIM-bh-Huy.accessibilityLabel" = "Terminer la configuration";
+
+/* Class = "UIButton"; normalTitle = "LINK ACCOUNT"; ObjectID = "bIM-bh-Huy"; */
+"bIM-bh-Huy.normalTitle" = "LIER LE COMPTE";
+
+/* Class = "UILabel"; accessibilityLabel = "Account setup assistant"; ObjectID = "bU8-Tu-9O4"; */
+"bU8-Tu-9O4.accessibilityLabel" = "Assistant de configuration de compte";
+
+/* Class = "UILabel"; text = "2/2"; ObjectID = "bU8-Tu-9O4"; */
+"bU8-Tu-9O4.text" = "2/2";
+
+/* Class = "UIButton"; accessibilityLabel = "Finish configuration"; ObjectID = "bes-x4-C4l"; */
+"bes-x4-C4l.accessibilityLabel" = "Terminer la configuration";
+
+/* Class = "UIButton"; normalTitle = "MAYBE LATER"; ObjectID = "bes-x4-C4l"; */
+"bes-x4-C4l.normalTitle" = "PEUT-ÊTRE PLUS TARD";
+
+/* Class = "UITextField"; accessibilityLabel = "Username"; ObjectID = "cEN-WO-5qv"; */
+"cEN-WO-5qv.accessibilityLabel" = "Nom d'utilisateur";
+
+/* Class = "UIButton"; highlightedTitle = "Choose your country"; ObjectID = "rLT-uU-cJS"; */
+"rLT-uU-cJS.highlightedTitle" = "Sélection du pays";
+
+/* Class = "UIButton"; normalTitle = "Select your country"; ObjectID = "rLT-uU-cJS"; */
+"rLT-uU-cJS.normalTitle" = "Sélection du pays";
+
+/* Class = "UILabel"; text = "PHONE NUMBER"; ObjectID = "v2Q-jf-BdL"; */
+"v2Q-jf-BdL.text" = "NUMÉRO DE TÉLÉPHONE";
+
+/* Class = "UILabel"; text = "ASSISTANT"; ObjectID = "zrj-TX-1RP"; */
+"zrj-TX-1RP.text" = "ASSISTANT";

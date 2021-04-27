@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina5_9" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AcknowledgementsView">
+            <connections>
+                <outlet property="licenceLabel" destination="sBd-Jg-iNI" id="K0B-vx-MaC"/>
+                <outlet property="siteURLLabel" destination="10z-h1-Yfq" id="RAC-Wn-ycD"/>
+                <outlet property="view" destination="iN0-l3-epB" id="cUi-i1-GEO"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" tag="14" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="GNU General Public License V2 © 2010-2017 Belledonne Communications" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="sBd-Jg-iNI" userLabel="licenseLabel">
+                    <rect key="frame" x="5" y="109" width="365" height="43"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="43" id="Ux7-hO-Qns"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" red="0.33333333329999998" green="0.33333333329999998" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" tag="13" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="https://www.linphone.org" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="10z-h1-Yfq" userLabel="siteURLLabel">
+                    <rect key="frame" x="0.0" y="66" width="375" height="29"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" tag="9" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LINPHONE" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.10000000149011612" translatesAutoresizingMaskIntoConstraints="NO" id="WO9-rT-UQN" userLabel="nameLabel">
+                    <rect key="frame" x="64" y="27" width="248" height="38"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="38" id="kHV-jd-3Cg"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="19"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="horz_line.png" translatesAutoresizingMaskIntoConstraints="NO" id="ZwU-cW-7hK">
+                    <rect key="frame" x="0.0" y="174" width="375" height="37"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="37" id="NdL-lI-FkV"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" tag="14" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="glaciersecurity.com" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="HS8-Wt-38U" userLabel="glicenseLabel">
+                    <rect key="frame" x="216" y="732.5" width="149" height="20.5"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="sBd-Jg-iNI" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="1ZW-ZC-8YP"/>
+                <constraint firstItem="HS8-Wt-38U" firstAttribute="trailing" secondItem="ZwU-cW-7hK" secondAttribute="trailing" constant="-10" id="8rJ-f4-weY"/>
+                <constraint firstItem="WO9-rT-UQN" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="64" id="9Ax-cJ-gC3"/>
+                <constraint firstItem="ZwU-cW-7hK" firstAttribute="trailing" secondItem="10z-h1-Yfq" secondAttribute="trailing" id="9Gs-sj-UMm"/>
+                <constraint firstItem="HS8-Wt-38U" firstAttribute="bottom" secondItem="h7c-bd-FbM" secondAttribute="bottom" constant="-25" id="Tce-7y-j99"/>
+                <constraint firstItem="sBd-Jg-iNI" firstAttribute="centerX" secondItem="WO9-rT-UQN" secondAttribute="centerX" id="YHF-a7-iBk"/>
+                <constraint firstItem="10z-h1-Yfq" firstAttribute="top" secondItem="WO9-rT-UQN" secondAttribute="bottom" constant="1" id="Yo8-j3-OJf"/>
+                <constraint firstItem="WO9-rT-UQN" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="27" id="aRW-hm-CTy"/>
+                <constraint firstItem="ZwU-cW-7hK" firstAttribute="top" secondItem="sBd-Jg-iNI" secondAttribute="bottom" constant="22" id="aZq-tF-YMK"/>
+                <constraint firstItem="sBd-Jg-iNI" firstAttribute="centerX" secondItem="10z-h1-Yfq" secondAttribute="centerX" id="as4-aw-KfG"/>
+                <constraint firstItem="sBd-Jg-iNI" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="5" id="b8E-Fz-f1P"/>
+                <constraint firstItem="sBd-Jg-iNI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="109" id="mIU-Jw-Ku0"/>
+                <constraint firstItem="sBd-Jg-iNI" firstAttribute="top" secondItem="10z-h1-Yfq" secondAttribute="bottom" constant="14" id="sKh-3G-gsL"/>
+                <constraint firstItem="ZwU-cW-7hK" firstAttribute="leading" secondItem="10z-h1-Yfq" secondAttribute="leading" id="sVy-d7-GCR"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="h7c-bd-FbM"/>
+            <point key="canvasLocation" x="34.5" y="54"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="horz_line.png" width="375" height="54"/>
+    </resources>
+</document>
